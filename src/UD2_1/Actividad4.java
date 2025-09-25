@@ -5,7 +5,7 @@ class Hilo extends Thread{
     @Override
     public void run() {
         for (int i = 0; i < 10; i++) {
-            System.out.println("Mensaje");
+            System.out.println("Hilo 1: Buenassss");
             try {
                 sleep(1000);
             } catch (InterruptedException e) {
@@ -19,15 +19,20 @@ public class Actividad4 {
         Hilo hilo = new Hilo();
         hilo.start();
 
-        while (true){
-            if (hilo.isAlive()) {
-                System.out.println("Esta vivo");
-            }else {
-                System.out.println("Se murió");
+            while(hilo.isAlive()) {
+                try {
+                    System.out.println("Main: Esta vivo :)");
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
             }
+
+            System.out.println("Main: Se murió :(");
+
 
 
 
         }
     }
-}
+
