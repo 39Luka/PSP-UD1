@@ -1,0 +1,8 @@
+Servidor web con muchas peticiones I/O -> Es de tipo I/O bound, sí utilizaria porque cada hilo pude gestionar cada petición, si no se utilizaran hilos la alternativa sería una cola de mensajes.
+Procesar 1 archivo de 5 MB -> Es de tipo CPU-bound, yo no utilizaría hilos porque es una tarea sencilla, simplemente es leer secuencialmente la información.
+Descargar 50 imagenes -> Es de tipo I/O-bound, sí utilizaría hilos, ya que, cada uno de los hilos puede encargarse de una descarga, la alternativa sería hacer una cola de tareas.
+Aplicar filtro a una imagen 8K -> Es de tipo CPU-bound, sí utilizaría los hilos para que cada uno renderizará una porción de la imagen, ya que, es una muy grande, la es hacerlo secuencial que tardaría bastante más. 
+Esperar respuesta de 10 APIs -> Es de tipo I/O-bound, sí utilizaria los hilos, ya que cada uno se encargaría de una respuesta y no se bloquearía, la alternativa es hacer una cola de tareas.
+Calcular primos hasta N muy grande -> Es de tipo CPU-bound, sí utilizaría hilos, cada hilo podría buscar en un rango diferente, la alternativa sería hacerlo secuencial que tardaría mucho más.
+Generar miniaturas de 1000 imágenes -> Es de tipo CPU-bound, sí utilizaria los hilos para que cada uno proceso una miniatura distinta, la alternativa es hacerlo secuencial.
+Copiar archivos grandes en el disco duro -> Es de tipo I/O-bound, sí utilizaría los hilos para que cada uno copiará un archivo, la alternativa al no uso de hilos es la cola de copias o la copia secuencial.
