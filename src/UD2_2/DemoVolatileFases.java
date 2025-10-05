@@ -5,8 +5,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DemoVolatileFases {
     // PRUEBA: comenta 'volatile' y observa comportamientos erráticos.
-    private static /*volatile*/ boolean running = true; // señal de parada
-    private static /*volatile*/ int phase = 1;          // 1 = A, 2 = B
+    private static volatile boolean running = true; // señal de parada
+    private static volatile int phase = 1;          // 1 = A, 2 = B
 
     // Nota: usamos AtomicInteger solo para contar; 'volatile' NO da atomicidad.
     private static final AtomicInteger processedA = new AtomicInteger();
