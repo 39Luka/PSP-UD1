@@ -16,11 +16,6 @@ public class Tienda {
         this.totalVentas += monto;
     }
     public void aplicarDescuento(double descuento){
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
         totalVentas -= totalVentas*descuento/100;
     }
 

@@ -15,6 +15,11 @@ public class Administrador extends Thread{
     public void run() {
         Random random = new Random();
         int descuento = random.nextInt(1, 100);
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println("Aplicando descuento...");
         tienda.aplicarDescuento(25);
 
