@@ -28,6 +28,32 @@ public class Pedido {
     public Estado getEstado() {
         return estado;
     }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
+    public void setUnidades(int unidades) {
+        this.unidades = unidades;
+    }
+
+    public void setEstado(Estado estado) {
+        this.estado = estado;
+    }
+
+    @Override
+    public String toString() {
+        return "Pedido{" +
+                "id='" + id + '\'' +
+                ", sku='" + sku + '\'' +
+                ", unidades=" + unidades +
+                ", estado=" + estado +
+                '}';
+    }
 }
 
 enum Estado{
