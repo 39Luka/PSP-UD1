@@ -21,7 +21,8 @@ public class Administrador extends Thread{
             throw new RuntimeException(e);
         }
         System.out.println("Aplicando descuento...");
-        tienda.aplicarDescuento(25);
+        tienda.aplicarDescuento(25); //Se ha puesto a 25 para que siempre sea 25% de descuento
+                                    // pero si se pone el descuento sería aleatorio
 
     }
 }

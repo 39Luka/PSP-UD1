@@ -1,10 +1,17 @@
 package UD2_3;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Tienda {
     private double totalVentas;
+    private int totalTransacciones;
+    private List<Integer> registroMontos;
 
     public Tienda() {
         this.totalVentas = 0;
+        this.totalTransacciones = 0;
+        this.registroMontos = new ArrayList<>();
     }
 
     public void agregarVenta(int monto){
