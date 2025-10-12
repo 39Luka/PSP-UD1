@@ -7,6 +7,10 @@ public class Erp {
     private Map<String,Integer> inventario;
     private Map<String,Pedido> pedidos;
 
+    final Object lockInventario = new Object();
+    final Object lockPedidos = new Object();
+    private final Map<String, Object> locksPorSku = new HashMap<>();
+
     public Erp(Map<String, Integer> stockInicial) {
         this.inventario = stockInicial;
         this.pedidos = new HashMap<>();
@@ -20,73 +24,97 @@ public class Erp {
         }
         if(unidades > 0) {
             Pedido nuevoPedido = new Pedido(id, unidades, sku);
-            pedidos.put(id, nuevoPedido);
+            synchronized (lockPedidos){
+            pedidos.put(id, nuevoPedido);}
         }else{
             System.out.println("Las unidades tienen que ser superiores a 0");
         }
     }
 
-    public void reponerStock(String sku, int unidades){
+    public  void reponerStock(String sku, int unidades){
+        Object skuLock = lockDeSku(sku);
+        synchronized (skuLock){
         inventario.put(sku, inventario.getOrDefault(sku,0) + unidades);
+        }
     }
-    public void reservarStock(String id){
+    public  void reservarStock(String id) {
         try {
             Thread.sleep(77);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        Pedido pedido = pedidos.get(id);
+        Pedido pedido;
+        synchronized (lockPedidos) {
+            pedido = pedidos.get(id);
+        }
         String sku = pedido.getSku();
-        int unidadesRequeridas = pedido.unidades;
+        int unidadesRequeridas = pedido.getUnidades();
 
-        int unidadesDisponibles = inventario.get(sku);
-
-        if (unidadesRequeridas <= unidadesDisponibles){
+        int unidadesDisponibles;
+        synchronized (lockInventario) {
+            unidadesDisponibles = inventario.get(sku);
+        }
+        if (unidadesRequeridas <= unidadesDisponibles) {
             pedido.setEstado(Estado.RESERVADO);
-            pedidos.put(id, pedido);
-        }else{
+            synchronized (lockPedidos){
+            pedidos.put(id, pedido);}
+        } else {
             System.out.println("No se puedo reservar el pedido " + id);
         }
 
     }
 
-    public void confirmarPedido(String id){
+    public  void confirmarPedido(String id) {
         try {
             Thread.sleep(54);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        Pedido pedido = pedidos.get(id);
-        if(pedido.getEstado().equals(Estado.RESERVADO)){
+        Pedido pedido;
+        synchronized (lockPedidos) {
+            pedido = pedidos.get(id);
+        }
+        if (pedido.getEstado().equals(Estado.RESERVADO)) {
 
             String sku = pedido.getSku();
-            int unidadesRequeridas = pedido.unidades;
+            int unidadesRequeridas = pedido.getUnidades();
 
-            inventario.put(sku, inventario.get(sku) - unidadesRequeridas);
+            Object skuLock = lockDeSku(sku);
+            synchronized (skuLock) {
+                inventario.put(sku, inventario.get(sku) - unidadesRequeridas);
+            }
             pedido.setEstado(Estado.CONFIRMADO);
-            pedidos.put(id, pedido);
+            synchronized (lockPedidos){
+            pedidos.put(id, pedido);}
 
-        }else{
-            System.out.println("No se puede confirmar el pedido "+id+", ya que no esta reservado");
+        } else {
+            System.out.println("No se puede confirmar el pedido " + id + ", ya que no esta reservado");
         }
     }
 
-    public void cancelarPedido(String id){
+    public  void cancelarPedido(String id) {
         try {
             Thread.sleep(78);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-        Pedido pedido = pedidos.get(id);
-        if(pedido.getEstado().equals(Estado.CONFIRMADO)) {
+        Pedido pedido;
+        synchronized (lockPedidos) {
+            pedido = pedidos.get(id);
+        }
+        if (pedido.getEstado().equals(Estado.CONFIRMADO)) {
             String sku = pedido.getSku();
-            int unidadesRequeridas = pedido.unidades;
+            int unidadesRequeridas = pedido.getUnidades();
 
-            inventario.put(sku, inventario.get(sku) + unidadesRequeridas);
+            synchronized (lockInventario) {
+                inventario.put(sku, inventario.get(sku) + unidadesRequeridas);
+            }
         }
         pedido.setEstado(Estado.CANCELADO);
-        pedidos.remove(id);
+       synchronized (lockPedidos) {
+           pedidos.remove(id);
+       }
 
     }
 
@@ -104,5 +132,23 @@ public class Erp {
 
     public void setInventario(Map<String, Integer> inventario) {
         this.inventario = inventario;
+    }
+    private Object lockDeSku(String sku) {
+        synchronized (lockInventario) {
+            return locksPorSku.computeIfAbsent(sku, k -> new Object());
+        }
+    }
+
+    public String snapshotSku(String sku) {
+        int pedidosSku;
+        synchronized (lockPedidos) {
+            pedidosSku = (int) pedidos.values().stream().filter(p -> p.getSku().equals(sku)).count();
+        }
+        int stockSku;
+        Object skuLock = lockDeSku(sku);
+        synchronized (skuLock) {
+            stockSku = inventario.getOrDefault(sku, 0);
+        }
+        return "SKU=" + sku + " | stock=" + stockSku + " | pedidos=" + pedidosSku;
     }
 }
